@@ -1,1 +1,73 @@
-<app-board [board]="board"></app-board>
+<div class="layout">
+  <nav class="navbar">
+    <span class="nav-title">AdaChess</span>
+    <div class="nav-right">
+      <div class="turn-badge">
+        <span class="turn-dot" [class.white-dot]="turn === 'white'" [class.black-dot]="turn === 'black'"></span>
+        <span class="turn-label">{{ turn === 'white' ? 'White' : 'Black' }}</span>
+        <span class="move-label">Move {{ moveNumber }}</span>
+      </div>
+      <button class="nav-btn" (click)="resetGame()">New Game</button>
+      <button class="nav-btn" (click)="saveGame()">Save</button>
+      <div class="saves-wrapper">
+        <button class="nav-btn" [class.active]="showSavedGames" (click)="toggleSavedGames()">
+          My Games
+          <span class="saves-count" *ngIf="savedGames.length > 0">{{ savedGames.length }}</span>
+        </button>
+        <div class="saves-panel" *ngIf="showSavedGames">
+          <div class="saves-header">
+            <span>Saved Games</span>
+            <button class="close-btn" (click)="showSavedGames = false">&times;</button>
+          </div>
+          <div class="saves-list" *ngIf="savedGames.length > 0">
+            <div class="save-entry" *ngFor="let save of savedGames" (click)="loadGameById(save.id)">
+              <div class="save-info">
+                <span class="save-date">{{ save.date }}</span>
+                <span class="save-detail">Move {{ save.moveNumber }} &middot; {{ save.turn === 'white' ? 'White' : 'Black' }} to move</span>
+              </div>
+              <button class="delete-btn" (click)="deleteSave(save.id, $event)" title="Delete">&times;</button>
+            </div>
+          </div>
+          <div class="saves-empty" *ngIf="savedGames.length === 0">
+            No saved games yet
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="backdrop" *ngIf="showSavedGames" (click)="showSavedGames = false"></div>
+
+  <div class="game-area">
+    <div class="board-section">
+      <div class="captured-column">
+        <span class="captured-piece" *ngFor="let piece of (boardFlipped ? capturedByWhite : capturedByBlack)">{{ getPieceSymbol(piece) }}</span>
+      </div>
+
+      <div class="board-center">
+        <app-board [board]="board" [possibleMoves]="possibleMoves" [cantMoveCoordinate]="cantMoveCoordinate" [selectedCoordinate]="selectedCoordinate" [lastMoveFrom]="lastMoveFrom" [lastMoveTo]="lastMoveTo" [flipped]="boardFlipped"></app-board>
+
+        <div class="nav-controls">
+          <button class="nav-arrow-btn" [disabled]="!canGoBack" (click)="goBack()" title="Go back">
+            <svg width="16" height="16" viewBox="0 0 16 16"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <span class="move-indicator">{{ currentMoveDisplay }} / {{ totalMoves }}</span>
+          <button class="nav-arrow-btn" [disabled]="!canGoForward" (click)="goForward()" title="Go forward">
+            <svg width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="nav-arrow-btn flip-btn" (click)="toggleFlip()" title="Flip board">
+            <svg width="16" height="16" viewBox="0 0 16 16">
+              <path d="M2 11l3 3 3-3M5 14V6M14 5l-3-3-3 3M11 2v8" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="captured-column">
+        <span class="captured-piece" *ngFor="let piece of (boardFlipped ? capturedByBlack : capturedByWhite)">{{ getPieceSymbol(piece) }}</span>
+      </div>
+    </div>
+
+    <div class="save-toast" *ngIf="saveMessage">{{ saveMessage }}</div>
+  </div>
+</div>

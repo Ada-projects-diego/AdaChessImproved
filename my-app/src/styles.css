@@ -1,1 +1,14 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #312e2b;
+  min-height: 100vh;
+  color: #e0d6c2;
+  overflow-x: hidden;
+}

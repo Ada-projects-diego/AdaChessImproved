@@ -1,5 +1,33 @@
-<div *ngIf="board.boxes" class="board">
-    <div class="board-row" *ngFor="let row of board.boxes; index as i;">
-        <app-box class="board-box" *ngFor="let box of row; index as j;" [box]="board.boxes[i][j]"></app-box>
+<div *ngIf="board.boxes" class="board-frame">
+  <div class="board"
+       #boardGrid
+       (click)="onBoardClick()"
+       (contextmenu)="onBoardContextMenu($event)"
+       (mousedown)="onBoardMouseDown($event)"
+       (mouseup)="onBoardMouseUp($event)">
+    <div class="board-row" *ngFor="let row of displayRows; index as i; trackBy: trackByRow">
+      <span class="rank-label">{{ getRankLabel(i) }}</span>
+      <app-box class="board-box" *ngFor="let box of row; trackBy: trackByBox" [box]="box" [possibleMoves]="possibleMoves" [cantMoveCoordinate]="cantMoveCoordinate" [selectedCoordinate]="selectedCoordinate" [lastMoveFrom]="lastMoveFrom" [lastMoveTo]="lastMoveTo" [isHighlighted]="isHighlighted(box.coordinate.x, box.coordinate.y)"></app-box>
     </div>
+    <div class="file-labels">
+      <span class="file-label" *ngFor="let file of displayFiles">{{ file }}</span>
+    </div>
+    <svg class="arrow-overlay" *ngIf="arrows.length > 0">
+      <defs>
+        <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="rgba(235,150,50,0.85)"/>
+        </marker>
+      </defs>
+      <line *ngFor="let arrow of arrows"
+            [attr.x1]="getArrowX(arrow.from.y)"
+            [attr.y1]="getArrowY(arrow.from.x)"
+            [attr.x2]="getArrowX(arrow.to.y)"
+            [attr.y2]="getArrowY(arrow.to.x)"
+            stroke="rgba(235,150,50,0.85)"
+            stroke-width="8"
+            stroke-linecap="round"
+            marker-end="url(#arrowhead)"
+            opacity="0.9"/>
+    </svg>
+  </div>
 </div>

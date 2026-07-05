@@ -1,16 +1,95 @@
 .chessBox {
-    min-width: 50px;
-    min-height: 50px;
-
-    max-width: 90px;
-    max-height: 90px;
-
-    /* Responsive width */
-    width: 6vw;
-    height: 6vw;
-
-    /* Align icons center */ 
+    width: var(--square-size, 60px);
+    height: var(--square-size, 60px);
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease;
+}
+
+.light-square {
+    background-color: #f0d9b5;
+}
+
+.dark-square {
+    background-color: #b58863;
+}
+
+fa-icon {
+    font-size: calc(var(--square-size, 60px) * 0.58);
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+::ng-deep .white-piece svg {
+    color: #fff;
+    stroke: #000;
+    stroke-width: 15px;
+    paint-order: stroke;
+    filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.3));
+}
+
+::ng-deep .black-piece svg {
+    color: #1a1a1a;
+    stroke: #fff;
+    stroke-width: 15px;
+    paint-order: stroke;
+    filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));
+}
+
+.legal-move-dot {
+    width: 30%;
+    height: 30%;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.18);
+    pointer-events: none;
+}
+
+.legal-move-capture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 5px rgba(0, 0, 0, 0.18);
+    pointer-events: none;
+}
+
+.selected {
+    box-shadow: inset 0 0 0 100px rgba(255, 255, 50, 0.45) !important;
+}
+
+.last-move {
+    box-shadow: inset 0 0 0 100px rgba(255, 255, 0, 0.22);
+}
+
+.piece-jump {
+    animation: piece-jump 0.3s ease-out;
+}
+
+@keyframes piece-jump {
+    0%   { transform: translateY(0); }
+    40%  { transform: translateY(-8px); }
+    100% { transform: translateY(0); }
+}
+
+.highlighted {
+    box-shadow: inset 0 0 0 100px rgba(235, 50, 50, 0.55) !important;
+}
+
+.cant-move {
+    animation: cant-move-pulse 0.6s ease-in-out;
+}
+
+@keyframes cant-move-pulse {
+    0%   { box-shadow: inset 0 0 0 100px transparent; }
+    25%  { box-shadow: inset 0 0 0 100px rgba(220, 50, 50, 0.55); }
+    50%  { box-shadow: inset 0 0 0 100px transparent; }
+    75%  { box-shadow: inset 0 0 0 100px rgba(220, 50, 50, 0.55); }
+    100% { box-shadow: inset 0 0 0 100px transparent; }
 }

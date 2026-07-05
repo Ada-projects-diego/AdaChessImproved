@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Board } from 'src/app/shared/model/board.model';
 import { Coordinate } from 'src/app/shared/model/coordinate.model';
+import { colour } from 'src/app/shared/enums/colour.enum';
 
 import { HelperService } from './helper.service';
 
@@ -11,7 +12,7 @@ import { HelperService } from './helper.service';
 export class AvailableMovesService {
   constructor(private _helperService:HelperService){}
 
-  getMoves(board:Board, piecePos:Coordinate, getKillerMoves:boolean = false):Coordinate[]{
+  getMoves(board:Board, piecePos:Coordinate, getKillerMoves:boolean = false, skipCastling:boolean = false):Coordinate[]{
     let moves:Coordinate[] = [];
     switch(board.boxes[piecePos.x][piecePos.y].getPiece().type) {
       case 'pawn':
@@ -33,7 +34,7 @@ export class AvailableMovesService {
         moves = this.getQueenMoves(piecePos, board);
         break;
       case 'king':
-        moves = this.getKingMoves(piecePos, board);
+        moves = this.getKingMoves(piecePos, board, skipCastling);
         break;
     }
     return moves;
@@ -223,17 +224,56 @@ export class AvailableMovesService {
     return possibleMoves;
   }
   
-  private getKingMoves(piecePos:Coordinate,board:Board):Coordinate[]{
-    let possibleMoves:Coordinate[] = []; 
+  private isSquareUnderAttack(square:Coordinate, attackerColour:colour, board:Board):boolean{
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        let piece = board.boxes[i][j].getPiece();
+        if(piece?.colour == attackerColour){
+          let moves = this.getMoves(board, board.boxes[i][j].coordinate, true, true);
+          if(this._helperService.isInArray(moves, square)){
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  private getKingMoves(piecePos:Coordinate,board:Board, skipCastling:boolean = false):Coordinate[]{
+    let possibleMoves:Coordinate[] = [];
     let king = board.boxes[piecePos.x][piecePos.y].getPiece();
+    let enemyColour = this._helperService.getOppositeColour(king.colour);
 
     for (let i = -1; i < 2; i++){
-      for (let j = -1; j < 2; j++){ 
-        if(board.boxes?.[piecePos.x + i]?.[piecePos.y + j]?.isEmpty() || board.boxes?.[piecePos.x + i]?.[piecePos.y + j]?.getPiece()?.colour == this._helperService.getOppositeColour(king.colour)){
+      for (let j = -1; j < 2; j++){
+        if(board.boxes?.[piecePos.x + i]?.[piecePos.y + j]?.isEmpty() || board.boxes?.[piecePos.x + i]?.[piecePos.y + j]?.getPiece()?.colour == enemyColour){
           possibleMoves.push(board.boxes[piecePos.x + i][piecePos.y + j].coordinate);
         }
       }
     }
+
+    // Castling
+    if(!skipCastling && !king.hasMoved && !this.isSquareUnderAttack(piecePos, enemyColour, board)){
+      // Kingside castling (rook at y=7)
+      let kingsideRook = board.boxes[piecePos.x][7].getPiece();
+      if(kingsideRook?.type == 'rook' && kingsideRook?.colour == king.colour && !kingsideRook.hasMoved){
+        if(board.boxes[piecePos.x][5].isEmpty() && board.boxes[piecePos.x][6].isEmpty()){
+          if(!this.isSquareUnderAttack(board.boxes[piecePos.x][5].coordinate, enemyColour, board)){
+            possibleMoves.push(board.boxes[piecePos.x][6].coordinate);
+          }
+        }
+      }
+      // Queenside castling (rook at y=0)
+      let queensideRook = board.boxes[piecePos.x][0].getPiece();
+      if(queensideRook?.type == 'rook' && queensideRook?.colour == king.colour && !queensideRook.hasMoved){
+        if(board.boxes[piecePos.x][1].isEmpty() && board.boxes[piecePos.x][2].isEmpty() && board.boxes[piecePos.x][3].isEmpty()){
+          if(!this.isSquareUnderAttack(board.boxes[piecePos.x][3].coordinate, enemyColour, board)){
+            possibleMoves.push(board.boxes[piecePos.x][2].coordinate);
+          }
+        }
+      }
+    }
+
     return possibleMoves;
   }
 }

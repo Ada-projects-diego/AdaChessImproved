@@ -13,6 +13,7 @@ import { BoxComponent } from './game/board/box/box.component';
 import { UpdateBoardService } from './shared/services/update-board.service';
 import { HelperService } from './shared/services/helper.service';
 import { AvailableMovesService } from './shared/services/available-moves.service';
+import { SoundService } from './shared/services/sound.service';
 import { ModalModule } from 'ngx-bootstrap/modal';
 
 @NgModule({
@@ -27,7 +28,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
     AppRoutingModule,
     FontAwesomeModule, ModalModule.forRoot()
   ],
-  providers: [AvailableMovesService, UpdateBoardService, HelperService],
+  providers: [AvailableMovesService, UpdateBoardService, HelperService, SoundService],
   bootstrap: [AppComponent]
 })
 export class AppModule { 

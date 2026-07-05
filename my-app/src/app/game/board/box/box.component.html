@@ -1,5 +1,12 @@
-<div class="chessBox" (click)="sendCoordinates(box.coordinate)"
-[ngStyle]="{
-'background-color': box.colour}">
-<fa-icon *ngIf="!(box.isEmpty())"  [icon]="[pieceColour, pieceType]" size="3x"></fa-icon>
+<div class="chessBox"
+  (click)="sendCoordinates(box.coordinate)"
+  [class.light-square]="box.colour === 'white'"
+  [class.dark-square]="box.colour === 'gray'"
+  [class.cant-move]="isCantMove"
+  [class.selected]="isSelected"
+  [class.last-move]="isLastMove"
+  [class.highlighted]="isHighlighted">
+  <fa-icon *ngIf="!(box.isEmpty())" [icon]="[pieceColour, pieceType]" [class.piece-jump]="isSelected" [class.white-piece]="isWhitePiece" [class.black-piece]="isBlackPiece"></fa-icon>
+  <div *ngIf="isLegalMove && !isCapture" class="legal-move-dot"></div>
+  <div *ngIf="isCapture" class="legal-move-capture"></div>
 </div>
